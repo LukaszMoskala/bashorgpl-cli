@@ -169,8 +169,11 @@ int main(int args, char** argv) {
     do {
       //czyszczenie ekranu
       clear();
+      //odczyt rozmiaru ekranu
+      //potrzebny do rysowania linii pod nagłówkiem i obliczenia pozycji stopki
       getmaxyx(stdscr, rows, cols);
       printQuote(dist, true);
+      //włącz kolor i wypisz stopkę
       attron(COLOR_PAIR(2));
       mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
       printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej");
