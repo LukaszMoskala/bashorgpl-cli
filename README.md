@@ -11,3 +11,9 @@ Będzie to powtarzane aż program otrzyma `^D` lub `^C`, lub w inny sposób zost
 # Tryb nieinteraktywny
 Program jako parametr przyjmuje ilość cytatów do wypisania, na przykład `./bashorgpl 5` wypisze 5 losowych cytatów, bez czyszczenia ekranu i oczekiwania na akcje użytkownika.
 Stworzone z myślą o dopisaniu tego do `.bashrc`, `.zshrc`, lub jakiej powłoki używasz.
+# Zewnętrzne zależności
+Do skompilowania wymagana jest biblioteka `ncurses` - https://invisible-island.net/ncurses/. Większość dystrybucji linuxa dostarcza ją w repozytoriach i nie trzeba kompilować ręcznie.
+
+Ubuntu: `sudo apt install libncurses-dev`
+
+Archlinux: `sudo pacman -S ncurses`

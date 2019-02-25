@@ -1,7 +1,7 @@
 CC=gcc
 CXX=g++
 #append these flags to command line flags
-override CXXFLAGS+=-O3 --std=c++17 -fconcepts
+override CXXFLAGS+=-O3 --std=c++17 -fconcepts -lncurses
 PREFIX=/usr/local
 
 all: bashorgpl
