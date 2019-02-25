@@ -28,6 +28,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <ncurses.h>
 
 using namespace std;
+//rozmiar ekranu
+int rows=0;
+int cols=0;
+
 char* bashdata;
 //jeden cytat od drugiego oddzielony jest sekwencją % nowa linia #
 //ta funkcja szuka tej sekwencji zaczynając na pozycji begin
@@ -67,14 +71,14 @@ void printQuote(auto dist, bool useCurses=false) {
 
     printw("\n");
     //dorysuj linie pod nagłówkiem
-    for(int i=0;i<header.size();i++)
+    for(int i=0;i<cols;i++)
       printw("=");
     if(quote[0] != '\n');
       printw("\n");
 
     attroff(COLOR_PAIR(1));//wyłącz zielony tekst
 
-    printw(quote.c_str()); //wypisz cytat
+    mvprintw(2,0,quote.c_str()); //wypisz cytat
   }
   else {
     cout<<header<<endl;
@@ -165,10 +169,8 @@ int main(int args, char** argv) {
     do {
       //czyszczenie ekranu
       clear();
-      printQuote(dist, true);
-      int rows=0;
-      int cols=0;
       getmaxyx(stdscr, rows, cols);
+      printQuote(dist, true);
       attron(COLOR_PAIR(2));
       mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
       printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej");
