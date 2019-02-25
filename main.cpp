@@ -121,6 +121,7 @@ int main(int args, char** argv) {
   }
   else { //tryb interaktywny
     initscr();
+    noecho();
     printw("bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
     printw("This program comes with ABSOLUTELY NO WARRANTY.\n");
     printw("This is free software, and you are welcome to redistribute it\n");
@@ -138,10 +139,13 @@ int main(int args, char** argv) {
       int cols=0;
       getmaxyx(stdscr, rows, cols);
       mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
-      printw("ESC lub Q żeby wyjść, cokolwiek innego żeby przeglądać dalej");
-      c=getch();
+      printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej");
+      do {
+        c=getch();
+      }
+      while(c != 'Q' && c != 'q' && c != ' ' && c != '\n');
     }
-    while(c != 'Q' && c != 'q' && c != 0x1b);
+    while(c != 'Q' && c != 'q');
     endwin();
   }
 
