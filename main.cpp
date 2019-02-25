@@ -25,6 +25,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <ctime>
 
+#include <ncurses.h>
+
 using namespace std;
 char* bashdata;
 //jeden cytat od drugiego oddzielony jest sekwencją % nowa linia #
@@ -39,14 +41,17 @@ std::mt19937 rng;
 //dlugosc pliku
 size_t l;
 //tutaj sie losuje i wypisuje cytat na ekran
-void printQuote(auto dist) {
+void printQuote(auto dist, bool useCurses=false) {
   int randomPosition=dist(rng); //losowa pozycja
   int realDataBegin=findwhatweneed(randomPosition)+3; //początek pierwszego cytatu po tej pozycji
   int next=findwhatweneed(realDataBegin); //początek kolejnego cytatu (koniec pierwszego)
-  while(realDataBegin < next) { //i cyk pętla do wyświetlenia
-    cout<<bashdata[realDataBegin++];
+  char data[next-realDataBegin+1];
+  memset(data,0,sizeof(data));
+  memcpy(data, bashdata+realDataBegin, next-realDataBegin);
+  if(useCurses) {
+    printw(data);
   }
-  cout<<endl;
+  else cout<<data<<endl;
 }
 //pokazuje ostrzeżenie jak plik nie byl modyfikowany przez więcej niż 14 dni
 void checkModTime() {
@@ -83,6 +88,7 @@ int loadFile() {
   return (k != l); //return 0 if k == l
 }
 int main(int args, char** argv) {
+  setlocale(LC_CTYPE, "");
   //sprawdzanie czasu modyfikacji pliku
   checkModTime();
   if(loadFile()) return 1; //konczymy jak sie nie załadowało
@@ -100,29 +106,25 @@ int main(int args, char** argv) {
     }
   }
   else { //tryb interaktywny
-    string s;
-    bool once=false;
+    initscr();
+    printw("bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
+    printw("This program comes with ABSOLUTELY NO WARRANTY.\n");
+    printw("This is free software, and you are welcome to redistribute it\n");
+    printw("under certain conditions; Read attached license file for details.\n");
+    printw("\n");
+    printw("You should have received a copy of the GNU General Public License\n");
+    printw("along with this program.  If not, see <https://www.gnu.org/licenses/>.\n");
+    getch();
+    char c;
     do {
       //czyszczenie ekranu
-      cout<<(char)0x1b<<"[2J";
-      if(!once) {
-        cout<<"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała"<<endl;
-        cout<<"This program comes with ABSOLUTELY NO WARRANTY."<<endl;
-        cout<<"This is free software, and you are welcome to redistribute it"<<endl;
-        cout<<"under certain conditions; Read attached license file for details."<<endl;
-        cout<<endl;
-        cout<<"You should have received a copy of the GNU General Public License"<<endl;
-        cout<<"along with this program.  If not, see <https://www.gnu.org/licenses/>."<<endl;
-        cout<<endl;
-        cout<<"======================================================================"<<endl;
-        cout<<endl;
-        once=true;
-      }
-      printQuote(dist);
-      cout<<"^D albo ^C aby wyjść, enter aby wyświetlać dalej"<<endl;
-      getline(cin,s);
+      clear();
+      printQuote(dist, true);
+      printw("\nESC lub Q żeby wyjść, cokolwiek innego żeby przeglądać dalej");
+      c=getch();
     }
-    while(cin.good() && s != "exit");
+    while(c != 'Q' && c != 'q' && c != 0x1b);
+    endwin();
   }
 
   //zwalniamy pamięć
