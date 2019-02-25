@@ -68,7 +68,14 @@ void printQuote(auto dist, bool useCurses=false) {
     attroff(COLOR_PAIR(1));
     printw(quote.c_str());
   }
-  else cout<<data<<endl;
+  else {
+    cout<<header<<endl;
+    for(int i=0;i<header.size();i++)
+      cout<<"=";
+    if(quote[0] != '\n');
+      cout<<endl;
+    cout<<quote<<endl;
+  }
 }
 //pokazuje ostrzeżenie jak plik nie byl modyfikowany przez więcej niż 14 dni
 void checkModTime() {
