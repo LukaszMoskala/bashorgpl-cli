@@ -57,16 +57,24 @@ void printQuote(auto dist, bool useCurses=false) {
   string header=s.substr(0,firstNl);
   string quote=s.substr(firstNl+1);
   if(useCurses) {
-    attron(COLOR_PAIR(1));
-    attron(A_BOLD);
-    printw(header.c_str());
-    attroff(A_BOLD);
+
+    attron(COLOR_PAIR(1)); //zielony tekst
+    attron(A_BOLD); //pogrubiony tekst
+
+    printw(header.c_str()); //wypisz nagłówek
+
+    attroff(A_BOLD); //wyłącz pogrubiony tekst
+
     printw("\n");
-    for(int i=0;i<header.size();i++) printw("=");
+    //dorysuj linie pod nagłówkiem
+    for(int i=0;i<header.size();i++)
+      printw("=");
     if(quote[0] != '\n');
-    printw("\n");
-    attroff(COLOR_PAIR(1));
-    printw(quote.c_str());
+      printw("\n");
+
+    attroff(COLOR_PAIR(1));//wyłącz zielony tekst
+
+    printw(quote.c_str()); //wypisz cytat
   }
   else {
     cout<<header<<endl;
