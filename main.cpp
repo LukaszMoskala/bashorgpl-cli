@@ -52,8 +52,17 @@ void printQuote(auto dist, bool useCurses=false) {
   char data[next-realDataBegin+1];
   memset(data,0,sizeof(data));
   memcpy(data, bashdata+realDataBegin, next-realDataBegin);
+  string s(data);
+  int firstNl=s.find("\n");
+  string header=s.substr(0,firstNl);
+  string quote=s.substr(firstNl+1);
   if(useCurses) {
-    printw(data);
+    printw(header.c_str());
+    printw("\n");
+    for(int i=0;i<header.size();i++) printw("=");
+    if(quote[0] != '\n');
+    printw("\n");
+    printw(quote.c_str());
   }
   else cout<<data<<endl;
 }
