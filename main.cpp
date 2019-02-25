@@ -120,7 +120,11 @@ int main(int args, char** argv) {
       //czyszczenie ekranu
       clear();
       printQuote(dist, true);
-      printw("\nESC lub Q żeby wyjść, cokolwiek innego żeby przeglądać dalej");
+      int rows=0;
+      int cols=0;
+      getmaxyx(stdscr, rows, cols);
+      mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
+      printw("ESC lub Q żeby wyjść, cokolwiek innego żeby przeglądać dalej");
       c=getch();
     }
     while(c != 'Q' && c != 'q' && c != 0x1b);
