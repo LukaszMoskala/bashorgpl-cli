@@ -28,6 +28,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <ncurses.h>
 
 using namespace std;
+//rozmiar ekranu
+int rows=0;
+int cols=0;
+
 char* bashdata;
 //jeden cytat od drugiego oddzielony jest sekwencją % nowa linia #
 //ta funkcja szuka tej sekwencji zaczynając na pozycji begin
@@ -52,10 +56,38 @@ void printQuote(auto dist, bool useCurses=false) {
   char data[next-realDataBegin+1];
   memset(data,0,sizeof(data));
   memcpy(data, bashdata+realDataBegin, next-realDataBegin);
+  string s(data);
+  int firstNl=s.find("\n");
+  string header=s.substr(0,firstNl);
+  string quote=s.substr(firstNl+1);
   if(useCurses) {
-    printw(data);
+
+    attron(COLOR_PAIR(1)); //zielony tekst
+    attron(A_BOLD); //pogrubiony tekst
+
+    printw(header.c_str()); //wypisz nagłówek
+
+    attroff(A_BOLD); //wyłącz pogrubiony tekst
+
+    printw("\n");
+    //dorysuj linie pod nagłówkiem
+    for(int i=0;i<cols;i++)
+      printw("=");
+    if(quote[0] != '\n');
+      printw("\n");
+
+    attroff(COLOR_PAIR(1));//wyłącz zielony tekst
+
+    mvprintw(2,0,quote.c_str()); //wypisz cytat
   }
-  else cout<<data<<endl;
+  else {
+    cout<<header<<endl;
+    for(int i=0;i<header.size();i++)
+      cout<<"=";
+    if(quote[0] != '\n');
+      cout<<endl;
+    cout<<quote<<endl;
+  }
 }
 //pokazuje ostrzeżenie jak plik nie byl modyfikowany przez więcej niż 14 dni
 void checkModTime() {
@@ -122,6 +154,9 @@ int main(int args, char** argv) {
   else { //tryb interaktywny
     initscr();
     noecho();
+    start_color();
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_BLUE, COLOR_BLACK);
     printw("bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
     printw("This program comes with ABSOLUTELY NO WARRANTY.\n");
     printw("This is free software, and you are welcome to redistribute it\n");
@@ -134,12 +169,15 @@ int main(int args, char** argv) {
     do {
       //czyszczenie ekranu
       clear();
-      printQuote(dist, true);
-      int rows=0;
-      int cols=0;
+      //odczyt rozmiaru ekranu
+      //potrzebny do rysowania linii pod nagłówkiem i obliczenia pozycji stopki
       getmaxyx(stdscr, rows, cols);
+      printQuote(dist, true);
+      //włącz kolor i wypisz stopkę
+      attron(COLOR_PAIR(2));
       mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
       printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej");
+      attroff(COLOR_PAIR(2));
       do {
         c=getch();
       }
