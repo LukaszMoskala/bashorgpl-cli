@@ -86,6 +86,9 @@ int main(int args, char** argv) {
   else { //tryb interaktywny
     string s;
     do {
+      //czyszczenie ekranu
+      cout<<(char)0x1b<<"[2J";
+
       printQuote(dist);
       cout<<"^D albo ^C aby wyjść, enter aby wyświetlać dalej"<<endl;
       getline(cin,s);
