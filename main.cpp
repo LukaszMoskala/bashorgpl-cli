@@ -57,11 +57,13 @@ void printQuote(auto dist, bool useCurses=false) {
   string header=s.substr(0,firstNl);
   string quote=s.substr(firstNl+1);
   if(useCurses) {
+    attron(COLOR_PAIR(1));
     printw(header.c_str());
     printw("\n");
     for(int i=0;i<header.size();i++) printw("=");
     if(quote[0] != '\n');
     printw("\n");
+    attroff(COLOR_PAIR(1));
     printw(quote.c_str());
   }
   else cout<<data<<endl;
@@ -131,6 +133,9 @@ int main(int args, char** argv) {
   else { //tryb interaktywny
     initscr();
     noecho();
+    start_color();
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_BLUE, COLOR_BLACK);
     printw("bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
     printw("This program comes with ABSOLUTELY NO WARRANTY.\n");
     printw("This is free software, and you are welcome to redistribute it\n");
@@ -147,8 +152,10 @@ int main(int args, char** argv) {
       int rows=0;
       int cols=0;
       getmaxyx(stdscr, rows, cols);
+      attron(COLOR_PAIR(2));
       mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
       printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej");
+      attroff(COLOR_PAIR(2));
       do {
         c=getch();
       }
