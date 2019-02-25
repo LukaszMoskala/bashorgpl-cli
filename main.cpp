@@ -58,7 +58,9 @@ void printQuote(auto dist, bool useCurses=false) {
   string quote=s.substr(firstNl+1);
   if(useCurses) {
     attron(COLOR_PAIR(1));
+    attron(A_BOLD);
     printw(header.c_str());
+    attroff(A_BOLD);
     printw("\n");
     for(int i=0;i<header.size();i++) printw("=");
     if(quote[0] != '\n');
