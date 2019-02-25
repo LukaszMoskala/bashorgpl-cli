@@ -67,12 +67,14 @@ int loadFile() {
   return (k != l); //return 0 if k == l
 }
 int main(int args, char** argv) {
-
+  //sprawdzanie czasu modyfikacji pliku
   checkModTime();
   if(loadFile()) return 1; //konczymy jak sie nie załadowało
+
   //generator liczb losowych podjebany ze stack overflow
   rng.seed(std::random_device()());
   std::uniform_int_distribution<std::mt19937::result_type> dist(0,l*0.95);
+
   //parametr zawiera liczbe cytatów do wyświetlenia
   if(args > 1) {
     int n=atoi(argv[1]);
@@ -81,7 +83,7 @@ int main(int args, char** argv) {
       printQuote(dist);
     }
   }
-  else {
+  else { //tryb interaktywny
     string s;
     do {
       printQuote(dist);
