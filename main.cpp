@@ -40,6 +40,10 @@ int findwhatweneed(int begin) {
 std::mt19937 rng;
 //dlugosc pliku
 size_t l;
+
+//$HOME/.bashdata.txt
+string bashdata_location;
+
 //tutaj sie losuje i wypisuje cytat na ekran
 void printQuote(auto dist, bool useCurses=false) {
   int randomPosition=dist(rng); //losowa pozycja
@@ -56,11 +60,11 @@ void printQuote(auto dist, bool useCurses=false) {
 //pokazuje ostrzeżenie jak plik nie byl modyfikowany przez więcej niż 14 dni
 void checkModTime() {
   struct stat result;
-  if(stat("bashdata.txt", &result)==0)
+  if(stat(bashdata_location.c_str(), &result)==0)
   {
     auto mod_time = result.st_ctime;
     double diff=(time(NULL)-mod_time)/60.0/60.0/24.0;
-    cout<<"bashdata.txt zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
+    cout<<bashdata_location<<" zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
     if(diff > 14.0) cout<<"Zalecana aktualizacja: ./pobierz.sh"<<endl;
   }
   else {
@@ -70,9 +74,9 @@ void checkModTime() {
 }
 int loadFile() {
   ifstream plik;
-  plik.open("bashdata.txt");
+  plik.open(bashdata_location.c_str());
   if(!plik.is_open()) {
-    cout<<"Nie znaleziono bashdata.txt"<<endl;
+    cout<<"Nie znaleziono "<<bashdata_location<<endl;
     cout<<"Uruchom skrypt pobierz.sh"<<endl;
     return 1;
   }
@@ -89,6 +93,15 @@ int loadFile() {
 }
 int main(int args, char** argv) {
   setlocale(LC_CTYPE, "");
+  char* home;
+  home=getenv("HOME");
+  if(home != NULL) {
+    bashdata_location=string(home)+"/.bashdata.txt";
+  }
+  else {
+    cout<<"Nie udało się ustalić wartości $HOME"<<endl;
+    return 1;
+  }
   //sprawdzanie czasu modyfikacji pliku
   checkModTime();
   if(loadFile()) return 1; //konczymy jak sie nie załadowało
