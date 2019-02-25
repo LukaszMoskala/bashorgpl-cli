@@ -5,5 +5,5 @@ then
   echo "Nie wykryłem WGETa"
   exit 1
 fi
-rm -f "$HOME/.bashdata.txt"
+mv -v "$HOME/.bashdata.txt" "$HOME/.bashdata.txt.old"
 $WGET "http://bash.org.pl/text" -O "$HOME/.bashdata.txt"
