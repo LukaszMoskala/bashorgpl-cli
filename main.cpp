@@ -92,6 +92,7 @@ int loadFile() {
   return (k != l); //return 0 if k == l
 }
 int main(int args, char** argv) {
+  //wymagane dla UTF-8
   setlocale(LC_CTYPE, "");
   char* home;
   home=getenv("HOME");
