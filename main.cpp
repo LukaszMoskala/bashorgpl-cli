@@ -121,10 +121,12 @@ int loadFile() {
   plik.read(bashdata,l);
   size_t k=plik.gcount();
   plik.close();
-  return (k != l); //return 0 if k == l
+  //zwraca 1 jeżeli k jest różne od l, co może spowodować chyba tylko błąd odczytu
+  return (k != l);
 }
 int main(int args, char** argv) {
   //wymagane dla UTF-8
+  //i w systemie musi być wygenerowane LOCALE wspierające utf-8
   setlocale(LC_CTYPE, "");
   char* home;
   home=getenv("HOME");
