@@ -89,13 +89,14 @@ void printQuote(auto dist, bool useCurses=false) {
     cout<<quote<<endl;
   }
 }
+//Ta funkcja i kolejna, to połączenie kodu z kilku przykładowych programów ze strony
+//https://curl.haxx.se
 static size_t write_bashdata_to_memory(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   char* tmp=(char*)realloc(bashdata, l+size*nmemb);
   if(tmp == NULL) return 0;
   bashdata=tmp;
   memcpy(bashdata+l, ptr, size*nmemb);
-  //size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
   l+=size*nmemb;
   return size*nmemb;
 }
@@ -107,13 +108,9 @@ int downloadbashdata() {
   if(curl) {
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(curl, CURLOPT_URL, "http://bash.org.pl/text");
-    /* example.com is redirected, so we tell libcurl to follow redirection */
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_bashdata_to_memory);
-
-    /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
-    /* Check for errors */
     if(res != CURLE_OK) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
       return 1;
