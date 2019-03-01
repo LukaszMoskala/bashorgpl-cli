@@ -26,7 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <ctime>
 
 #include <ncurses.h>
-
+#include <curl/curl.h>
 using namespace std;
 //rozmiar ekranu
 int rows=0;
@@ -89,27 +89,59 @@ void printQuote(auto dist, bool useCurses=false) {
     cout<<quote<<endl;
   }
 }
+//Ta funkcja i kolejna, to połączenie kodu z kilku przykładowych programów ze strony
+//https://curl.haxx.se
+static size_t write_bashdata_to_memory(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+  char* tmp=(char*)realloc(bashdata, l+size*nmemb);
+  if(tmp == NULL) return 0;
+  bashdata=tmp;
+  memcpy(bashdata+l, ptr, size*nmemb);
+  l+=size*nmemb;
+  return size*nmemb;
+}
+int downloadbashdata() {
+  CURL *curl;
+  CURLcode res;
+  bashdata=(char*)malloc(1);
+  curl = curl_easy_init();
+  if(curl) {
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+    curl_easy_setopt(curl, CURLOPT_URL, "http://bash.org.pl/text");
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_bashdata_to_memory);
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      return 1;
+    }
+    curl_easy_cleanup(curl);
+  }
+  else return 1;
+  return 0;
+}
 //pokazuje ostrzeżenie jak plik nie byl modyfikowany przez więcej niż 14 dni
-void checkModTime() {
+int checkModTime() {
   struct stat result;
   if(stat(bashdata_location.c_str(), &result)==0)
   {
     auto mod_time = result.st_ctime;
     double diff=(time(NULL)-mod_time)/60.0/60.0/24.0;
     cout<<bashdata_location<<" zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
-    if(diff > 14.0) cout<<"Zalecana aktualizacja: ./pobierz.sh"<<endl;
+    if(diff > 14.0) return 1; //zwróć 1 jak plik jest stary i trzeba zaktualizować
   }
   else {
     cout<<"Nie udało się wykonać stat na bashdata.txt: "<<strerror(errno)<<endl;
+    return 1;//zwróć 1 jak się nie udało wykonać stat
   }
-  cout<<endl;
+  return 0;
+
 }
 int loadFile() {
   ifstream plik;
   plik.open(bashdata_location.c_str());
   if(!plik.is_open()) {
     cout<<"Nie znaleziono "<<bashdata_location<<endl;
-    cout<<"Uruchom skrypt pobierz.sh"<<endl;
     return 1;
   }
   plik.seekg(0,ios_base::end);
@@ -138,12 +170,26 @@ int main(int args, char** argv) {
     return 1;
   }
   //sprawdzanie czasu modyfikacji pliku
-  checkModTime();
-  if(loadFile()) return 1; //konczymy jak sie nie załadowało
-
+  if(checkModTime() == 0) {
+    cout<<bashdata_location<<" młodszy niż 14 dni, nie aktualizuj"<<endl;
+    if(loadFile()) {
+      cout<<"Lol, nie udało się załadować xD"<<endl;
+      return 1;
+    }
+  }
+  else {
+    cout<<"Aktualizuje plik"<<endl;
+    if(downloadbashdata()) {
+      cout<<"Nie udało się, próbuje odczytać z dysku"<<endl;
+      if(loadFile()) {
+        cout<<"Też się nie udało, siema"<<endl;
+        return 1;
+      }
+    }
+  }
   //generator liczb losowych podjebany ze stack overflow
   rng.seed(std::random_device()());
-  std::uniform_int_distribution<std::mt19937::result_type> dist(0,l*0.95);
+  std::uniform_int_distribution<std::mt19937::result_type> dist(0,l-1);
 
   //parametr zawiera liczbe cytatów do wyświetlenia
   if(args > 1) {
