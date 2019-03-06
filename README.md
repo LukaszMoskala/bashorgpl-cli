@@ -7,7 +7,7 @@ Następnie cały plik ładowany jest do pamięci.
 Program losuje losowe miejsce w pliku z przedziału <0,ROZMIAR-1>, znajduje tam sekwencję `%\n#` oznaczającą początek cytatu, następnie znajduje początek następnego cytatu i wyswietla wszystko pomiędzy nimi.
 # Tryb interaktywny
 Program po uruchomieniu wyczyści ekran i wypisze losowy cytat. Po wciśnięciu enter, wyczyści ekran i ponownie wypisze losowy cytat.
-Będzie to powtarzane aż program otrzyma `^D` lub `^C`, lub w inny sposób zostanie zamknięty
+Będzie to powtarzane aż użytkownik wciśnie `q`
 # Tryb nieinteraktywny
 Program jako parametr przyjmuje ilość cytatów do wypisania, na przykład `./bashorgpl 5` wypisze 5 losowych cytatów, bez czyszczenia ekranu i oczekiwania na akcje użytkownika.
 Stworzone z myślą o dopisaniu tego do `.bashrc`, `.zshrc`, lub jakiej powłoki używasz.
