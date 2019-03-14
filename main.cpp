@@ -118,6 +118,15 @@ int downloadbashdata() {
     curl_easy_cleanup(curl);
   }
   else return 1;
+  ofstream plik;
+  plik.open(bashdata_location.c_str());
+  if(plik.is_open()) {
+    plik.write(bashdata, l);
+    plik.close();
+  }
+  else {
+    cout<<"Nie udało się zapisać nowych danych do "<<bashdata_location<<endl;
+  }
   return 0;
 }
 //pokazuje ostrzeżenie jak plik nie byl modyfikowany przez więcej niż 14 dni
