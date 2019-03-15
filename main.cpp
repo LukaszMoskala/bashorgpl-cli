@@ -163,6 +163,8 @@ int checkModTime() {
   return 0;
 
 }
+//Ta funkcja odczytuje cały plik do pamięci
+//na chwile obecną plik zajmuje około 1.8MB więc można sobie na to pozwolić
 int loadFile() {
   ifstream plik;
   plik.open(bashdata_location.c_str());
@@ -170,16 +172,23 @@ int loadFile() {
     cout<<"Nie znaleziono "<<bashdata_location<<endl;
     return 1;
   }
+  //przesuwamy kursor odczytu na koniec pliku żeby sprawdzić jego długość
   plik.seekg(0,ios_base::end);
+  //odczytujemy pozycje na jakiej jesteśmy
   l=plik.tellg();
+  //przechodzmy z powrotem na początek pliku
   plik.seekg(0);
-
+  //alokujemy pamięć
   bashdata=(char*)malloc(l+1);
   bashdata[l]=0;
+  //odczytujemy dane z pliku
   plik.read(bashdata,l);
+  //sprawdzamy ile danych faktycznie odczytaliśmy
   size_t k=plik.gcount();
+  //zamykamy plik
   plik.close();
-  //zwraca 1 jeżeli k jest różne od l, co może spowodować chyba tylko błąd odczytu
+  //zwraca 1 jeżeli k jest różne od l, co może być spowodowane
+  //chyba tylko przez błąd odczytu
   return (k != l);
 }
 int args;
