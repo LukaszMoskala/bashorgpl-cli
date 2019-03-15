@@ -115,7 +115,7 @@ int downloadbashdata() {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_bashdata_to_memory);
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      cout<<"curl_easy_perform(): "<<curl_easy_strerror(res)<<endl;
       return 1;
     }
     curl_easy_cleanup(curl);
