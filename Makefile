@@ -1,7 +1,8 @@
 CC=gcc
 CXX=g++
 #append these flags to command line flags
-override CXXFLAGS+=-O3 --std=c++17 -fconcepts -lncurses -lcurl
+override CXXFLAGS+=-O3 --std=c++17 -fconcepts
+CXXLIBS=-lncurses -lcurl
 PREFIX=/usr/local
 
 all: bashorgpl
@@ -9,7 +10,7 @@ all: bashorgpl
 bashorgpl.o: main.cpp
 	$(CXX) $(CXXFLAGS) -c -o bashorgpl.o main.cpp
 bashorgpl: bashorgpl.o
-	$(CXX) $(CXXFLAGS) -o bashorgpl bashorgpl.o
+	$(CXX) $(CXXFLAGS) -o bashorgpl bashorgpl.o $(CXXLIBS)
 
 install:
 	install -m 775 bashorgpl $(PREFIX)/bin/
