@@ -258,6 +258,9 @@ int main(int _args, char** _argv) {
   rng.seed(std::random_device()());
   std::uniform_int_distribution<std::mt19937::result_type> dist(0,l-1);
 
+  //Kompatybilność wsteczna
+  if(args == 2 && n == 0 && string(argv[1]).find("=") == -1)
+    n=atoi(argv[1]);
   //parametr zawiera liczbe cytatów do wyświetlenia
   if(n > 0) {
     //wyświetlamy n cytatów
