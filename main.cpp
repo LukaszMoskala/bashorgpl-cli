@@ -75,9 +75,12 @@ void printQuote(auto dist, bool useCurses=false) {
       if(quote[0] != '\n');
         printw("\n");
       attroff(COLOR_PAIR(1));//wyłącz zielony tekst
+      mvprintw(2,0,quote.c_str()); //wypisz cytat
+    }
+    else {
+      mvprintw(0,0,quote.c_str());
     }
 
-    mvprintw(2,0,quote.c_str()); //wypisz cytat
   }
   else {
     if(printHeader) {
