@@ -261,7 +261,8 @@ int main(int _args, char** _argv) {
   //Kompatybilność wsteczna
   if(args == 2 && n == 0 && string(argv[1]).find("=") == -1)
     n=atoi(argv[1]);
-  //parametr zawiera liczbe cytatów do wyświetlenia
+  //N oznacza ilość cytatów do wyświetlenia, jak jest równy 0
+  //używamy trybu interaktywnego
   if(n > 0) {
     //wyświetlamy n cytatów
     for(int i=0;i<n;i++) {
