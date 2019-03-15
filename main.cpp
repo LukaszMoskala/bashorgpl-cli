@@ -51,6 +51,17 @@ bool printHeader=true;
 string bashdata_location;
 
 //tutaj sie losuje i wypisuje cytat na ekran
+
+/*
+W zasadzie w tej funkcji jest bug.
+Gdy randomPosition wskazuje na ostatni cytat, nie znajdziemy następnego
+wtedy funkcja findwhatweneed może spróbować odczytać pamięć innego procesu
+i program zostanie zabity przez jądro. Mimo to szanse na to że tak się stanie
+są niewielkie, a nawet jak tak się stanie to po prostu program się wysypie
+i nie będzie z tym jakiegoś wielkiego problemu, więc nie widzę sensu naprawiania
+tego buga
+*/
+
 void printQuote(auto dist, bool useCurses=false) {
   int randomPosition=dist(rng); //losowa pozycja
   int realDataBegin=findwhatweneed(randomPosition)+3; //początek pierwszego cytatu po tej pozycji
