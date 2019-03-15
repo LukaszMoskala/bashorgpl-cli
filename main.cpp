@@ -211,8 +211,7 @@ int main(int _args, char** _argv) {
   //wymagane dla UTF-8
   //i w systemie musi być wygenerowane LOCALE wspierające utf-8
   setlocale(LC_CTYPE, "");
-  char* home;
-  home=getenv("HOME");
+  char* home=getenv("HOME");
   if(home != NULL) {
     bashdata_location=string(home)+"/.bashdata.txt";
   }
