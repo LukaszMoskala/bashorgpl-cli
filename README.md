@@ -22,6 +22,7 @@ Ubuntu: `sudo apt install libncurses-dev libcurl3-gnutls-dev`
 
 Archlinux: `sudo pacman -S ncurses libcurl-gnutls`
 # Kompilacja (Linux)
+Zainstaluj ncurses i libcurl kompilując je ze źródła lub używając menedżera pakietów odpowiedniego dla Twojej dystrybucji
 ```
 git clone https://github.com/LukaszMoskala/bashorgpl-cli.git
 cd bashorgpl-cli
