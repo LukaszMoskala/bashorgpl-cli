@@ -46,7 +46,7 @@ std::mt19937 rng;
 size_t l;
 
 bool beVerbose=true;
-
+bool printHeader=true;
 //$HOME/.bashdata.txt
 string bashdata_location;
 
@@ -63,31 +63,30 @@ void printQuote(auto dist, bool useCurses=false) {
   string header=s.substr(0,firstNl);
   string quote=s.substr(firstNl+1);
   if(useCurses) {
-
-    attron(COLOR_PAIR(1)); //zielony tekst
-    attron(A_BOLD); //pogrubiony tekst
-
-    printw(header.c_str()); //wypisz nagłówek
-
-    attroff(A_BOLD); //wyłącz pogrubiony tekst
-
-    printw("\n");
-    //dorysuj linie pod nagłówkiem
-    for(int i=0;i<cols;i++)
-      printw("=");
-    if(quote[0] != '\n');
+    if(printHeader) {
+      attron(COLOR_PAIR(1)); //zielony tekst
+      attron(A_BOLD); //pogrubiony tekst
+      printw(header.c_str()); //wypisz nagłówek
+      attroff(A_BOLD); //wyłącz pogrubiony tekst
       printw("\n");
-
-    attroff(COLOR_PAIR(1));//wyłącz zielony tekst
+      //dorysuj linie pod nagłówkiem
+      for(int i=0;i<cols;i++)
+        printw("=");
+      if(quote[0] != '\n');
+        printw("\n");
+      attroff(COLOR_PAIR(1));//wyłącz zielony tekst
+    }
 
     mvprintw(2,0,quote.c_str()); //wypisz cytat
   }
   else {
-    cout<<header<<endl;
-    for(int i=0;i<header.size();i++)
-      cout<<"=";
-    if(quote[0] != '\n');
-      cout<<endl;
+    if(printHeader) {
+      cout<<header<<endl;
+      for(int i=0;i<header.size();i++)
+        cout<<"=";
+      if(quote[0] != '\n');
+        cout<<endl;
+    }
     cout<<quote<<endl;
   }
 }
@@ -189,6 +188,9 @@ int main(int _args, char** _argv) {
   argv=_argv;
   //informacje o stanie pliku
   beVerbose=(getval("badzrozmowny","tak") == "tak");
+  //pokazywać nagłówek cytatu?
+  //chodzi o to w tej postaci: 9695 (http://bash.org.pl/9695/)
+  printHeader=(getval("pokaznaglowek","tak") == "tak");
   //ilosc cytatów do wyświetlenia, 0 oznacza tryb interaktywny
   int n=atoi(getval("n","0").c_str());
 
