@@ -9,8 +9,12 @@ Program losuje losowe miejsce w pliku z przedziału <0,ROZMIAR-1>, znajduje tam 
 Program po uruchomieniu wyczyści ekran i wypisze losowy cytat. Po wciśnięciu enter, wyczyści ekran i ponownie wypisze losowy cytat.
 Będzie to powtarzane aż użytkownik wciśnie `q`
 # Tryb nieinteraktywny
-Program jako parametr przyjmuje ilość cytatów do wypisania, na przykład `./bashorgpl 5` wypisze 5 losowych cytatów, bez czyszczenia ekranu i oczekiwania na akcje użytkownika.
+Program jako parametr przyjmuje ilość cytatów do wypisania, na przykład `./bashorgpl n=5` wypisze 5 losowych cytatów, bez czyszczenia ekranu i oczekiwania na akcje użytkownika.
 Stworzone z myślą o dopisaniu tego do `.bashrc`, `.zshrc`, lub jakiej powłoki używasz.
+# Wyciszanie
+Program domyślnie wyświetla informacje o stanie pliku `.bashdata.txt`, oraz, podczas jego pobierania, ustawia CURLa żeby pokazywał pełne informacje (`CURLOPT_VERBOSE`). Jeżeli chcesz pozbyć się tych wiadomości, użyj argumentu `badzrozmowny=nie`
+# Wypisywanie nagłówków
+Aby nie wyświetlać nagłówków cytatów, dodaj argument `pokaznaglowek=nie`. Działa to zarówno w trybie interaktywnym, jak i nieinteraktywnym.
 # Zewnętrzne zależności
 Do skompilowania wymagana jest biblioteka `ncurses` oraz `libcurl`. Są one używane odpowiednio do trybu interaktywnego oraz pobierania danych.
 
