@@ -45,6 +45,8 @@ std::mt19937 rng;
 //dlugosc pliku
 size_t l;
 
+bool beVerbose=true;
+
 //$HOME/.bashdata.txt
 string bashdata_location;
 
@@ -106,7 +108,8 @@ int downloadbashdata() {
   bashdata=(char*)malloc(1);
   curl = curl_easy_init();
   if(curl) {
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+    if(beVerbose)
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(curl, CURLOPT_URL, "http://bash.org.pl/text");
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_bashdata_to_memory);
@@ -136,7 +139,8 @@ int checkModTime() {
   {
     auto mod_time = result.st_ctime;
     double diff=(time(NULL)-mod_time)/60.0/60.0/24.0;
-    cout<<bashdata_location<<" zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
+    if(beVerbose)
+      cout<<bashdata_location<<" zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
     if(diff > 14.0) return 1; //zwróć 1 jak plik jest stary i trzeba zaktualizować
   }
   else {
@@ -180,16 +184,18 @@ int main(int args, char** argv) {
   }
   //sprawdzanie czasu modyfikacji pliku
   if(checkModTime() == 0) {
-    cout<<bashdata_location<<" młodszy niż 14 dni, nie aktualizuj"<<endl;
+    if(beVerbose)
+      cout<<bashdata_location<<" młodszy niż 14 dni, nie aktualizuj"<<endl;
     if(loadFile()) {
       cout<<"Lol, nie udało się załadować xD"<<endl;
       return 1;
     }
   }
   else {
-    cout<<"Aktualizuje plik"<<endl;
+    if(beVerbose)
+      cout<<"Aktualizuje plik"<<endl;
     if(downloadbashdata()) {
-      cout<<"Nie udało się, próbuje odczytać z dysku"<<endl;
+      cout<<"Nie udało się zaktualizować pliku, próbuje odczytać z dysku"<<endl;
       if(loadFile()) {
         cout<<"Też się nie udało, siema"<<endl;
         return 1;
