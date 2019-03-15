@@ -14,18 +14,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//tych 3 chyba nie muszę tłumaczyć
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <random>
+//memset jest w tej bibliotece
+//memcpy chyba też
 #include <cstring>
-
+//do odczytu daty modyfikacji
 #include <sys/types.h>
 #include <sys/stat.h>
-
+//potrzebujemy date żeby porównać
+//z datą modyfikacji
 #include <ctime>
-
+//do trybu interaktywnego
 #include <ncurses.h>
+//do pobierania pliku
 #include <curl/curl.h>
 using namespace std;
 //rozmiar ekranu
