@@ -14,18 +14,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//tych 3 chyba nie muszę tłumaczyć
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <random>
+//memset jest w tej bibliotece
+//memcpy chyba też
 #include <cstring>
-
+//do odczytu daty modyfikacji
 #include <sys/types.h>
 #include <sys/stat.h>
-
+//potrzebujemy date żeby porównać
+//z datą modyfikacji
 #include <ctime>
-
+//do trybu interaktywnego
 #include <ncurses.h>
+//do pobierania pliku
 #include <curl/curl.h>
 using namespace std;
 //rozmiar ekranu
@@ -45,10 +49,23 @@ std::mt19937 rng;
 //dlugosc pliku
 size_t l;
 
+bool beVerbose=true;
+bool printHeader=true;
 //$HOME/.bashdata.txt
 string bashdata_location;
 
 //tutaj sie losuje i wypisuje cytat na ekran
+
+/*
+W zasadzie w tej funkcji jest bug.
+Gdy randomPosition wskazuje na ostatni cytat, nie znajdziemy następnego
+wtedy funkcja findwhatweneed może spróbować odczytać pamięć innego procesu
+i program zostanie zabity przez jądro. Mimo to szanse na to że tak się stanie
+są niewielkie, a nawet jak tak się stanie to po prostu program się wysypie
+i nie będzie z tym jakiegoś wielkiego problemu, więc nie widzę sensu naprawiania
+tego buga
+*/
+
 void printQuote(auto dist, bool useCurses=false) {
   int randomPosition=dist(rng); //losowa pozycja
   int realDataBegin=findwhatweneed(randomPosition)+3; //początek pierwszego cytatu po tej pozycji
@@ -61,31 +78,33 @@ void printQuote(auto dist, bool useCurses=false) {
   string header=s.substr(0,firstNl);
   string quote=s.substr(firstNl+1);
   if(useCurses) {
-
-    attron(COLOR_PAIR(1)); //zielony tekst
-    attron(A_BOLD); //pogrubiony tekst
-
-    printw(header.c_str()); //wypisz nagłówek
-
-    attroff(A_BOLD); //wyłącz pogrubiony tekst
-
-    printw("\n");
-    //dorysuj linie pod nagłówkiem
-    for(int i=0;i<cols;i++)
-      printw("=");
-    if(quote[0] != '\n');
+    if(printHeader) {
+      attron(COLOR_PAIR(1)); //zielony tekst
+      attron(A_BOLD); //pogrubiony tekst
+      printw(header.c_str()); //wypisz nagłówek
+      attroff(A_BOLD); //wyłącz pogrubiony tekst
       printw("\n");
+      //dorysuj linie pod nagłówkiem
+      for(int i=0;i<cols;i++)
+        printw("=");
+      if(quote[0] != '\n');
+        printw("\n");
+      attroff(COLOR_PAIR(1));//wyłącz zielony tekst
+      mvprintw(2,0,quote.c_str()); //wypisz cytat
+    }
+    else {
+      mvprintw(0,0,quote.c_str());
+    }
 
-    attroff(COLOR_PAIR(1));//wyłącz zielony tekst
-
-    mvprintw(2,0,quote.c_str()); //wypisz cytat
   }
   else {
-    cout<<header<<endl;
-    for(int i=0;i<header.size();i++)
-      cout<<"=";
-    if(quote[0] != '\n');
-      cout<<endl;
+    if(printHeader) {
+      cout<<header<<endl;
+      for(int i=0;i<header.size();i++)
+        cout<<"=";
+      if(quote[0] != '\n');
+        cout<<endl;
+    }
     cout<<quote<<endl;
   }
 }
@@ -106,13 +125,14 @@ int downloadbashdata() {
   bashdata=(char*)malloc(1);
   curl = curl_easy_init();
   if(curl) {
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+    if(beVerbose)
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(curl, CURLOPT_URL, "http://bash.org.pl/text");
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_bashdata_to_memory);
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      cout<<"curl_easy_perform(): "<<curl_easy_strerror(res)<<endl;
       return 1;
     }
     curl_easy_cleanup(curl);
@@ -136,7 +156,8 @@ int checkModTime() {
   {
     auto mod_time = result.st_ctime;
     double diff=(time(NULL)-mod_time)/60.0/60.0/24.0;
-    cout<<bashdata_location<<" zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
+    if(beVerbose)
+      cout<<bashdata_location<<" zmodifikowany ostatnio "<<(int)diff<<" dni temu"<<endl;
     if(diff > 14.0) return 1; //zwróć 1 jak plik jest stary i trzeba zaktualizować
   }
   else {
@@ -146,6 +167,8 @@ int checkModTime() {
   return 0;
 
 }
+//Ta funkcja odczytuje cały plik do pamięci
+//na chwile obecną plik zajmuje około 1.8MB więc można sobie na to pozwolić
 int loadFile() {
   ifstream plik;
   plik.open(bashdata_location.c_str());
@@ -153,24 +176,57 @@ int loadFile() {
     cout<<"Nie znaleziono "<<bashdata_location<<endl;
     return 1;
   }
+  //przesuwamy kursor odczytu na koniec pliku żeby sprawdzić jego długość
   plik.seekg(0,ios_base::end);
+  //odczytujemy pozycje na jakiej jesteśmy
   l=plik.tellg();
+  //przechodzmy z powrotem na początek pliku
   plik.seekg(0);
-
+  //alokujemy pamięć
   bashdata=(char*)malloc(l+1);
   bashdata[l]=0;
+  //odczytujemy dane z pliku
   plik.read(bashdata,l);
+  //sprawdzamy ile danych faktycznie odczytaliśmy
   size_t k=plik.gcount();
+  //zamykamy plik
   plik.close();
-  //zwraca 1 jeżeli k jest różne od l, co może spowodować chyba tylko błąd odczytu
+  //zwraca 1 jeżeli k jest różne od l, co może być spowodowane
+  //chyba tylko przez błąd odczytu
   return (k != l);
 }
-int main(int args, char** argv) {
+int args;
+char** argv;
+//Odczytaj parametr z postaci arg=val
+string getval(string arg, string def="") {
+  for(int i=0;i<args;i++) {
+    string ca=argv[i];
+    int pos=ca.find("=");
+    if(pos > 0) {
+      if(ca.substr(0, pos) == arg) {
+        return ca.substr(pos+1);
+      }
+    }
+  }
+  return def;
+}
+int main(int _args, char** _argv) {
+  args=_args;
+  argv=_argv;
+  //informacje o stanie pliku
+  beVerbose=(getval("badzrozmowny","tak") == "tak");
+  //pokazywać nagłówek cytatu?
+  //chodzi o to w tej postaci: 9695 (http://bash.org.pl/9695/)
+  printHeader=(getval("pokaznaglowek","tak") == "tak");
+  //ilosc cytatów do wyświetlenia, 0 oznacza tryb interaktywny
+  int n=atoi(getval("n","0").c_str());
+
   //wymagane dla UTF-8
   //i w systemie musi być wygenerowane LOCALE wspierające utf-8
   setlocale(LC_CTYPE, "");
-  char* home;
-  home=getenv("HOME");
+
+  //ustalamy gdzie jest katalog domowy użytkownika
+  char* home=getenv("HOME");
   if(home != NULL) {
     bashdata_location=string(home)+"/.bashdata.txt";
   }
@@ -180,16 +236,18 @@ int main(int args, char** argv) {
   }
   //sprawdzanie czasu modyfikacji pliku
   if(checkModTime() == 0) {
-    cout<<bashdata_location<<" młodszy niż 14 dni, nie aktualizuj"<<endl;
+    if(beVerbose)
+      cout<<bashdata_location<<" młodszy niż 14 dni, nie aktualizuj"<<endl;
     if(loadFile()) {
       cout<<"Lol, nie udało się załadować xD"<<endl;
       return 1;
     }
   }
   else {
-    cout<<"Aktualizuje plik"<<endl;
+    if(beVerbose)
+      cout<<"Aktualizuje plik"<<endl;
     if(downloadbashdata()) {
-      cout<<"Nie udało się, próbuje odczytać z dysku"<<endl;
+      cout<<"Nie udało się zaktualizować pliku, próbuje odczytać z dysku"<<endl;
       if(loadFile()) {
         cout<<"Też się nie udało, siema"<<endl;
         return 1;
@@ -200,9 +258,12 @@ int main(int args, char** argv) {
   rng.seed(std::random_device()());
   std::uniform_int_distribution<std::mt19937::result_type> dist(0,l-1);
 
-  //parametr zawiera liczbe cytatów do wyświetlenia
-  if(args > 1) {
-    int n=atoi(argv[1]);
+  //Kompatybilność wsteczna
+  if(args == 2 && n == 0 && string(argv[1]).find("=") == -1)
+    n=atoi(argv[1]);
+  //N oznacza ilość cytatów do wyświetlenia, jak jest równy 0
+  //używamy trybu interaktywnego
+  if(n > 0) {
     //wyświetlamy n cytatów
     for(int i=0;i<n;i++) {
       printQuote(dist);
