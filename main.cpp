@@ -169,7 +169,29 @@ int loadFile() {
   //zwraca 1 jeżeli k jest różne od l, co może spowodować chyba tylko błąd odczytu
   return (k != l);
 }
-int main(int args, char** argv) {
+int args;
+char** argv;
+//Odczytaj parametr z postaci arg=val
+string getval(string arg, string def="") {
+  for(int i=0;i<args;i++) {
+    string ca=argv[i];
+    int pos=ca.find("=");
+    if(pos > 0) {
+      if(ca.substr(0, pos) == arg) {
+        return ca.substr(pos+1);
+      }
+    }
+  }
+  return def;
+}
+int main(int _args, char** _argv) {
+  args=_args;
+  argv=_argv;
+  //informacje o stanie pliku
+  beVerbose=(getval("badzrozmowny","tak") == "tak");
+  //ilosc cytatów do wyświetlenia, 0 oznacza tryb interaktywny
+  int n=atoi(getval("n","0").c_str());
+
   //wymagane dla UTF-8
   //i w systemie musi być wygenerowane LOCALE wspierające utf-8
   setlocale(LC_CTYPE, "");
@@ -207,8 +229,7 @@ int main(int args, char** argv) {
   std::uniform_int_distribution<std::mt19937::result_type> dist(0,l-1);
 
   //parametr zawiera liczbe cytatów do wyświetlenia
-  if(args > 1) {
-    int n=atoi(argv[1]);
+  if(n > 0) {
     //wyświetlamy n cytatów
     for(int i=0;i<n;i++) {
       printQuote(dist);
