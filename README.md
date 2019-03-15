@@ -21,3 +21,19 @@ Do skompilowania wymagana jest biblioteka `ncurses` oraz `libcurl`. Są one uży
 Ubuntu: `sudo apt install libncurses-dev libcurl3-gnutls-dev`
 
 Archlinux: `sudo pacman -S ncurses libcurl-gnutls`
+# Kompilacja (Linux)
+```
+git clone https://github.com/LukaszMoskala/bashorgpl-cli.git
+cd bashorgpl-cli
+make
+```
+# Instalacja (Linux)
+Program zostanie zainstalowany do /usr/local/bin
+```
+sudo make install
+```
+Aby zmienić katalog do instalacji, użyj flagi PREFIX.
+```
+sudo make PREFIX=/moj/folder/do/instalacji install
+```
+W tym przykładzie program zostanie zainstalowany w `/moj/folder/do/instalacji/bin/`
