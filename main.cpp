@@ -211,6 +211,8 @@ string getval(string arg, string def="") {
   return def;
 }
 int main(int _args, char** _argv) {
+  //na widowsie inicjuje winsockowe rzeczy
+  curl_global_init(CURL_GLOBAL_ALL);
   args=_args;
   argv=_argv;
   //informacje o stanie pliku
