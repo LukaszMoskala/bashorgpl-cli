@@ -31,6 +31,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <ncurses.h>
 //do pobierania pliku
 #include <curl/curl.h>
+//do kopiowania do schowka
+extern "C" {
+  #include "x11copy.h"
+}
 using namespace std;
 //rozmiar ekranu
 int rows=0;
@@ -65,15 +69,19 @@ są niewielkie, a nawet jak tak się stanie to po prostu program się wysypie
 i nie będzie z tym jakiegoś wielkiego problemu, więc nie widzę sensu naprawiania
 tego buga
 */
-
+char* stripedbashdata=nullptr;
+size_t datalen;
 void printQuote(auto dist, bool useCurses=false) {
   int randomPosition=dist(rng); //losowa pozycja
   int realDataBegin=findwhatweneed(randomPosition)+3; //początek pierwszego cytatu po tej pozycji
   int next=findwhatweneed(realDataBegin); //początek kolejnego cytatu (koniec pierwszego)
-  char data[next-realDataBegin+1];
-  memset(data,0,sizeof(data));
-  memcpy(data, bashdata+realDataBegin, next-realDataBegin);
-  string s(data);
+  free(stripedbashdata);
+  datalen=next-realDataBegin+1;
+
+  stripedbashdata=(char*)malloc(datalen);
+  memset(stripedbashdata,0,sizeof(stripedbashdata));
+  memcpy(stripedbashdata, bashdata+realDataBegin, next-realDataBegin);
+  string s(stripedbashdata);
   int firstNl=s.find("\n");
   string header=s.substr(0,firstNl);
   string quote=s.substr(firstNl+1);
@@ -227,6 +235,9 @@ int main(int _args, char** _argv) {
   //i w systemie musi być wygenerowane LOCALE wspierające utf-8
   setlocale(LC_CTYPE, "");
 
+  //zainicjuj bufor żeby free nie zwróciło zaraz błędu
+  stripedbashdata=(char*)malloc(1);
+
   //ustalamy gdzie jest katalog domowy użytkownika
   char* home=getenv("HOME");
   if(home != NULL) {
@@ -272,6 +283,7 @@ int main(int _args, char** _argv) {
     }
   }
   else { //tryb interaktywny
+    Atom xSelection=XCopyInit();
     initscr();
     noecho();
     start_color();
@@ -300,6 +312,10 @@ int main(int _args, char** _argv) {
       attroff(COLOR_PAIR(2));
       do {
         c=getch();
+        if(c == 'c' || c == 'C') {
+          //skopiuj do schowka
+          XCopy(xSelection, stripedbashdata, datalen);
+        }
       }
       while(c != 'Q' && c != 'q' && c != ' ' && c != '\n');
     }
