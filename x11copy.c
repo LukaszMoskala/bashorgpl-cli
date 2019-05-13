@@ -8,7 +8,7 @@ void XCopy(Atom selection, char * text, int size) {
 	Window owner;
 	XSetSelectionOwner (display, selection, window, 0);
 	if (XGetSelectionOwner (display, selection) != window) return;
-	while (1) {
+	//while (1) {
 		XNextEvent (display, &event);
 		switch (event.type) {
 			case SelectionRequest:
@@ -30,7 +30,7 @@ void XCopy(Atom selection, char * text, int size) {
 			case SelectionClear:
 			return;
 		}
-	}
+	//}
 }
 Atom XCopyInit() {
   display = XOpenDisplay(0);

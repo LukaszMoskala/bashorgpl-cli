@@ -79,7 +79,7 @@ void printQuote(auto dist, bool useCurses=false) {
   datalen=next-realDataBegin+1;
 
   stripedbashdata=(char*)malloc(datalen);
-  memset(stripedbashdata,0,sizeof(stripedbashdata));
+  memset(stripedbashdata,0,datalen);
   memcpy(stripedbashdata, bashdata+realDataBegin, next-realDataBegin);
   string s(stripedbashdata);
   int firstNl=s.find("\n");
