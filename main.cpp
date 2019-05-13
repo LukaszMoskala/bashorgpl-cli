@@ -308,7 +308,7 @@ int main(int _args, char** _argv) {
       //włącz kolor i wypisz stopkę
       attron(COLOR_PAIR(2));
       mvprintw(rows-2,0,"bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
-      printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej");
+      printw("Q żeby wyjść, spacja albo enter żeby przeglądać dalej | c żeby skopiować do schowka");
       attroff(COLOR_PAIR(2));
       do {
         c=getch();
