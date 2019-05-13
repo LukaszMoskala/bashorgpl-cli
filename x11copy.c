@@ -1,4 +1,8 @@
 #include "x11copy.h"
+
+//nie mam pojęcia jak to działa
+//https://github.com/exebook/x11clipboard/blob/master/x11copy.c
+
 Display * display;
 Window window;
 Atom targets_atom, text_atom, UTF8, XA_ATOM = 4, XA_STRING = 31;
