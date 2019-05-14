@@ -284,9 +284,16 @@ int main(int _args, char** _argv) {
     printw("\n");
     printw("You should have received a copy of the GNU General Public License\n");
     printw("along with this program.  If not, see <https://www.gnu.org/licenses/>.\n");
-    getch();
+    printw("\n");
+    attron(COLOR_PAIR(1));
+    printw("Wciśnij ENTER żeby przejść do programu\n");
+    printw("Q żeby wyjść\n");
+    attroff(COLOR_PAIR(1));
     char c;
     do {
+      c = getch();
+    }while(c != 'q' && c != 'Q' && c != '\n');
+    while(c != 'Q' && c != 'q') {
       //czyszczenie ekranu
       clear();
       //odczyt rozmiaru ekranu
@@ -303,7 +310,6 @@ int main(int _args, char** _argv) {
       }
       while(c != 'Q' && c != 'q' && c != ' ' && c != '\n');
     }
-    while(c != 'Q' && c != 'q');
     endwin();
   }
 
