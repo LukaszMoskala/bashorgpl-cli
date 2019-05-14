@@ -289,6 +289,7 @@ int main(int _args, char** _argv) {
     start_color();
     init_pair(1, COLOR_GREEN, COLOR_BLACK);
     init_pair(2, COLOR_BLUE, COLOR_BLACK);
+    init_pair(3, COLOR_RED, COLOR_BLACK);
     printw("bashorgpl-cli Copyright (C) 2019 Łukasz Konrad Moskała\n");
     printw("This program comes with ABSOLUTELY NO WARRANTY.\n");
     printw("This is free software, and you are welcome to redistribute it\n");
@@ -296,6 +297,12 @@ int main(int _args, char** _argv) {
     printw("\n");
     printw("You should have received a copy of the GNU General Public License\n");
     printw("along with this program.  If not, see <https://www.gnu.org/licenses/>.\n");
+    attron(COLOR_PAIR(3));
+    printw("\n");
+    printw("Używasz eksperymentalnej wersji wspierającej kopiowanie do schowka!\n");
+    printw("Jak zobaczysz SEGMENTATION FAULT to nie bądź zdziwiony, w tej wersji\n");
+    printw("jest sporo bugów.");
+    attroff(COLOR_PAIR(3));
     getch();
     char c;
     do {
